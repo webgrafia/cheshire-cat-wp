@@ -8,7 +8,6 @@ Author URI: https://bititup.it/
 License: GPL2
 */
 
-
 require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ .'/inc/admin.php';
 require_once __DIR__ .'/inc/shortcodes.php';
