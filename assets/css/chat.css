@@ -12,6 +12,7 @@
     bottom: 20px;
     right: 20px;
     z-index: 1000;
+    background-color: #fff;
 }
 
 #cheshire-chat-messages {
@@ -28,6 +29,7 @@
     display: flex;
     align-items: center;
     padding: 10px;
+    background-color: #fff;
 }
 
 #cheshire-chat-input {
@@ -39,6 +41,7 @@
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
     outline: none;
     margin: 0;
+    background-color: #fff;
 }
 
 #cheshire-chat-input:focus {
@@ -48,29 +51,33 @@
 
 /* Send Button */
 #cheshire-chat-send {
-    padding: 12px 15px;
+    padding: 0;
     border: none;
-    background-color: #0078d7;
-    color: #ffffff;
-    font-size: 14px;
-    font-weight: bold;
-    border-radius: 20px;
+    background-color: transparent;
+    color: #0078d7;
+    font-size: 20px;
     cursor: pointer;
-    width: 50px;
-    height: 45px;
+    width: 30px;
+    height: 30px;
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    transition: background-color 0.3s ease;
+    transition: color 0.3s ease;
     margin-left: 10px;
+    outline: none;
 }
 
 #cheshire-chat-send:hover {
-    background-color: #005bb5;
+    color: #005bb5;
 }
 
 #cheshire-chat-send:active {
-    background-color: #004494;
+    color: #004494;
+}
+
+/* Send Icon */
+#cheshire-chat-send i {
+    pointer-events: none; /* Prevent icon from interfering with button clicks */
 }
 
 /* User and bot message styling */
@@ -119,8 +126,8 @@
 
 /* Loader styles */
 .loader {
-    border: 3px solid #f3f3f3; /* Light gray */
-    border-top: 3px solid #0078d7; /* Blue */
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #0078d7;
     border-radius: 50%;
     width: 25px;
     height: 25px;

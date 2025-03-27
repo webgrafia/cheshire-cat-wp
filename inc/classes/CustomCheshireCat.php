@@ -1,6 +1,6 @@
 <?php
 
-namespace CheshireCatWp\classes;
+namespace CheshireCatWp\inc\classes;
 
 use CheshireCatSdk\CheshireCat;
 class CustomCheshireCat extends CheshireCat

@@ -1,6 +1,6 @@
 <?php
 
-namespace CheshireCatWp\classes;
+namespace CheshireCatWp\inc\classes;
 
 use CheshireCatSdk\Http\Clients\CheshireCatClient;
 use GuzzleHttp\Client;
