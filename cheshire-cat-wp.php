@@ -2,7 +2,7 @@
 /*
 Plugin Name: Cheshire Cat WP
 Description: A WordPress plugin to integrate the Cheshire Cat AI chatbot, offering seamless conversational AI for your site.
-Version: 0.1
+Version: 0.2
 Author: Marco Buttarini
 Author URI: https://bititup.it/
 License: GPL3
