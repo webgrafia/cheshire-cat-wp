@@ -1,0 +1,103 @@
+# Copyright (C) 2025 Marco Buttarini
+# This file is distributed under the GPL3.
+msgid ""
+msgstr ""
+"Project-Id-Version: Cheshire Cat WP 0.1\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/cheshire-cat-wp\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2025-03-27T20:38:37+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.7.1\n"
+"X-Domain: cheshire-cat-wp\n"
+
+#. Plugin Name of the plugin
+msgid "Cheshire Cat WP"
+msgstr ""
+
+#. Description of the plugin
+msgid "A WordPress plugin to integrate the Cheshire Cat AI chatbot, offering seamless conversational AI for your site."
+msgstr ""
+
+#. Author of the plugin
+msgid "Marco Buttarini"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://bititup.it/"
+msgstr ""
+
+#: inc/admin.php:5
+#: inc/admin.php:27
+msgid "Cheshire Cat Settings"
+msgstr ""
+
+#: inc/admin.php:5
+msgid "Cheshire Cat"
+msgstr ""
+
+#: inc/admin.php:12
+msgid "You do not have sufficient permissions to access this page."
+msgstr ""
+
+#: inc/admin.php:19
+msgid "Settings saved."
+msgstr ""
+
+#: inc/admin.php:31
+msgid "Cheshire Cat URL"
+msgstr ""
+
+#: inc/admin.php:36
+msgid "Cheshire Cat Token"
+msgstr ""
+
+#: inc/admin.php:42
+msgid "Enable Global Chat"
+msgstr ""
+
+#: inc/admin.php:49
+msgid "Save Changes"
+msgstr ""
+
+#: inc/admin.php:52
+msgid "Cheshire Cat Debug"
+msgstr ""
+
+#: inc/admin.php:63
+#: inc/admin.php:65
+#: inc/admin.php:79
+msgid "Connection Status:"
+msgstr ""
+
+#: inc/admin.php:65
+#: inc/admin.php:79
+msgid "Error"
+msgstr ""
+
+#: inc/admin.php:69
+msgid "Cheshire Available Plugins:"
+msgstr ""
+
+#: inc/admin.php:76
+msgid "No plugins found."
+msgstr ""
+
+#: inc/admin.php:80
+msgid "Error:"
+msgstr ""
+
+#: inc/admin.php:83
+msgid "Cheshire Cat URL or token not configured."
+msgstr ""
+
+#: inc/shortcodes.php:10
+msgid "Type your message here..."
+msgstr ""
+
+#: inc/shortcodes.php:11
+msgid "Send"
+msgstr ""

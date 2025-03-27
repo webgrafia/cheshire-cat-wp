@@ -1,6 +1,5 @@
 <?php
-use CheshireCatWp\CustomCheshireCat;
-
+use CheshireCatWp\classes\CustomCheshireCat;
 // ajax for chat
 function cheshire_plugin_ajax() {
     // Recupera il valore del messaggio
