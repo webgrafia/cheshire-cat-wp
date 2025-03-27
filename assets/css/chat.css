@@ -1,0 +1,175 @@
+/* Chat container */
+#cheshire-chat-container {
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin: 20px auto;
+    font-family: 'Arial', sans-serif;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#cheshire-chat-messages {
+    height: 300px;
+    overflow-y: auto;
+    padding: 10px 15px;
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #ddd;
+    scroll-behavior: smooth;
+}
+
+/* Chat input styles */
+#cheshire-chat-input {
+    width: calc(100% - 70px);
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    margin: 10px;
+    font-size: 14px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    outline: none;
+}
+
+#cheshire-chat-input:focus {
+    border-color: #0078d7;
+    box-shadow: inset 0 2px 6px rgba(0, 120, 215, 0.2);
+}
+
+/* Send Button */
+#cheshire-chat-send {
+    padding: 12px 15px;
+    margin: 10px;
+    border: none;
+    background-color: #0078d7;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 20px;
+    cursor: pointer;
+    width: 50px;
+    height: 45px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.3s ease;
+}
+
+#cheshire-chat-send:hover {
+    background-color: #005bb5;
+}
+
+#cheshire-chat-send:active {
+    background-color: #004494;
+}
+
+/* User and bot message styling */
+.user-message,
+.bot-message,
+.error-message {
+    margin-bottom: 15px;
+    padding: 10px 15px;
+    border-radius: 15px;
+    font-size: 14px;
+    max-width: 75%;
+    display: inline-block;
+    word-wrap: break-word;
+    clear: both;
+    position: relative;
+}
+
+/* Styles for user messages */
+.user-message {
+    background-color: #4caf50;
+    color: #ffffff;
+    text-align: right;
+    float: right;
+    animation: fadeInRight 0.3s ease-out;
+}
+
+/* Bot messages */
+.bot-message {
+    background-color: #ffffff;
+    color: #333333;
+    text-align: left;
+    float: left;
+    border: 1px solid #ddd;
+    animation: fadeInLeft 0.3s ease-out;
+}
+
+/* Error messages */
+.error-message {
+    background-color: #ffcccc;
+    border: 1px solid #ffaaaa;
+    color: #991111;
+    text-align: left;
+    float: left;
+    animation: shake 0.3s ease-out;
+}
+
+/* Loader styles */
+.loader {
+    border: 3px solid #f3f3f3; /* Light gray */
+    border-top: 3px solid #0078d7; /* Blue */
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    animation: spin 1s linear infinite;
+    margin: 10px auto;
+}
+
+/* Animations */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes shake {
+    0% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-5px);
+    }
+    50% {
+        transform: translateX(5px);
+    }
+    75% {
+        transform: translateX(-5px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+/* General styles */
+p {
+    margin: 0;
+    line-height: 1.5;
+}

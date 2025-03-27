@@ -1,6 +1,5 @@
 <?php
-
-use CheshireCatSdk\CheshireCat;
+use CheshireCatWp\CustomCheshireCat;
 
 // ajax for chat
 function cheshire_plugin_ajax() {
@@ -18,14 +17,18 @@ function cheshire_plugin_ajax() {
     }
 
     // Crea un'istanza di CheshireCat
-    $cheshire = new CheshireCat($cheshire_url, $cheshire_token);
+    $cheshire = new CustomCheshireCat($cheshire_url, $cheshire_token);
 
     try {
         // Invia il messaggio tramite il metodo send del CheshireCat
         $response = $cheshire->sendMessage($message);
-
+        //var_dump($response);
         // Restituisce la risposta come JSON
-        wp_send_json_success($response);
+        if (isset($response['text'])) {
+            wp_send_json_success($response['text']);
+        } else {
+            wp_send_json_success($response);
+        }
     } catch (\Exception $e) {
         // Gestisci eventuali errori
         wp_send_json_error($e->getMessage());
