@@ -2,7 +2,7 @@
 
 ![Cheshire Cat Logo](assets/img/logo-bg.png)
 
-**Cheshire Cat WP** is a WordPress plugin that integrates the [Cheshire Cat AI](https://cheshire-cat.ai/) chatbot into your WordPress website. It allows you to add a conversational AI assistant to your site, providing an interactive and engaging experience for your users.
+**Cheshire Cat WP** is a WordPress plugin that integrates the [Cheshire Cat AI](https://github.com/cheshire-cat-ai/) chatbot into your WordPress website. It allows you to add a conversational AI assistant to your site, providing an interactive and engaging experience for your users.
 
 ## Features
 
@@ -16,7 +16,7 @@
 
 ## Installation
 
-1.  **Download:** Download the latest release of the Cheshire Cat WP plugin from the [Releases](https://github.com/your-username/cheshire-cat-wp/releases) page (replace `your-username` with your GitHub username if you plan to host it there).
+1.  **Download:** Download the latest release of the Cheshire Cat WP plugin from the [Releases](https://github.com/webgrafia/cheshire-cat-wp/releases) page (replace `your-username` with your GitHub username if you plan to host it there).
 2.  **Upload:** Upload the `cheshire-cat-wp` folder to the `/wp-content/plugins/` directory of your WordPress installation.
 3.  **Activate:** Activate the plugin through the 'Plugins' menu in WordPress.
 
