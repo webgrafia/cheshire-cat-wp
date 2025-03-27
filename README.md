@@ -50,7 +50,8 @@ If you'd like to contribute to the development of this plugin, please feel free 
 
 ## License
 
-This plugin is licensed under the GPL3 license.
+This package is open-source software licensed under the [GNU GENERAL PUBLIC LICENSE](LICENSE).
+
 
 ## Support
 
