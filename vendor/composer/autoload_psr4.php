@@ -7,8 +7,15 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'WebSocket\\' => array($vendorDir . '/textalk/websocket/lib'),
-    'Psr\\Log\\' => array($vendorDir . '/psr/log/Psr/Log'),
+    'Psr\\Log\\' => array($vendorDir . '/psr/log/src'),
     'Psr\\Http\\Message\\' => array($vendorDir . '/psr/http-factory/src', $vendorDir . '/psr/http-message/src'),
+    'Psr\\Http\\Client\\' => array($vendorDir . '/psr/http-client/src'),
+    'Phrity\\Util\\' => array($vendorDir . '/phrity/util-errorhandler/src'),
+    'Phrity\\Net\\' => array($vendorDir . '/phrity/net-uri/src'),
+    'GuzzleHttp\\Psr7\\' => array($vendorDir . '/guzzlehttp/psr7/src'),
+    'GuzzleHttp\\Promise\\' => array($vendorDir . '/guzzlehttp/promises/src'),
+    'GuzzleHttp\\' => array($vendorDir . '/guzzlehttp/guzzle/src'),
     'CheshireCatWp\\' => array($baseDir . '/'),
-    '' => array($vendorDir . '/phrity/net-uri/src', $vendorDir . '/phrity/util-errorhandler/src'),
+    'CheshireCatSdk\\Facades\\' => array($vendorDir . '/webgrafia/cheshire-cat-sdk-laravel/src/Facades'),
+    'CheshireCatSdk\\' => array($vendorDir . '/webgrafia/cheshire-cat-sdk-laravel/src'),
 );

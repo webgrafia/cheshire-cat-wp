@@ -1,78 +1,87 @@
 <?php
 
-/**
- * Add the link to the admin page
- */
-function cheshire_plugin_menu() {
-    add_menu_page(
-        'Cheshire Cat WP', // Title of the page
-        'Cheshire Cat WP', // Text to show on the menu link
-        'manage_options', // Capability requirement to see the link
-        'cheshire-plugin-page', // The 'slug' - file to display when clicking the link
-        'cheshire_plugin_main_page', // The function to be called to output the content for this page.
-        'dashicons-smiley' // The icon to be used for this menu
+// Aggiunge una pagina di impostazioni al menu di amministrazione
+function cheshire_plugin_add_admin_menu() {
+    add_options_page(
+        'Cheshire Cat Settings', // Titolo della pagina
+        'Cheshire Cat', // Titolo del menu
+        'manage_options', // Capability richiesta
+        'cheshire-cat-settings', // Slug della pagina
+        'cheshire_plugin_options_page' // Funzione per visualizzare la pagina
     );
+}
+add_action('admin_menu', 'cheshire_plugin_add_admin_menu');
 
-    // add a submenu page
-    add_submenu_page(
-        'cheshire-plugin-page', // slug of the parent page
-        'Cheshire Chat', // The title of the page
-        'Chat', // The text to be displayed in the menu
-        'manage_options', // The capability required for this menu to be displayed to the user.
-        'cheshire-plugin-chat', // The slug of this submenu page
-        'cheshire_plugin_chat_page' // The function to be called to output the content for this page.
-    );
-
-    add_submenu_page(
-        'cheshire-plugin-page', // slug of the parent page
-        'Cheshire Setup', // The title of the page
-        'Setup', // The text to be displayed in the menu
-        'manage_options', // The capability required for this menu to be displayed to the user.
-        'cheshire-plugin-setup', // The slug of this submenu page
-        'cheshire_plugin_setup_page' // The function to be called to output the content for this page.
-    );
-
-
+// Funzione per visualizzare la pagina di impostazioni
+function cheshire_plugin_options_page() {
+    ?>
+    <div class="wrap">
+        <h1>Cheshire Cat Settings</h1>
+        <form method="post" action="options.php">
+            <?php
+            settings_fields('cheshire-cat-settings-group');
+            do_settings_sections('cheshire-cat-settings');
+            submit_button();
+            ?>
+        </form>
+    </div>
+    <?php
 }
 
-// Add the menu
-add_action( 'admin_menu', 'cheshire_plugin_menu' );
-
-// Show the main page
-function cheshire_plugin_main_page() {
-    include("admin/main.php");
-}
-
-// Show the chat page
-function cheshire_plugin_chat_page()
-{
-    include("admin/chat.php");
-}
-
-// Show the setup page
-function cheshire_plugin_setup_page()
-{
-    include("admin/setup.php");
-}
-
-
-// Register the settings
-add_action('admin_init', 'cheshire_plugin_register_websocket_settings');
-function cheshire_plugin_register_websocket_settings() {
+// Registra le impostazioni
+function cheshire_plugin_register_settings() {
     register_setting(
-        'cheshire-plugin-websocket-group', // Il nome del gruppo di impostazioni
-        'cheshire_plugin_websocket_url' // Il nome dell'opzione da salvare
+        'cheshire-cat-settings-group', // Nome del gruppo di impostazioni
+        'cheshire_plugin_url', // Nome dell'impostazione (URL)
+        'esc_url_raw' // Funzione di sanitizzazione
+    );
+    register_setting(
+        'cheshire-cat-settings-group', // Nome del gruppo di impostazioni
+        'cheshire_plugin_token', // Nome dell'impostazione (Token)
+        'sanitize_text_field' // Funzione di sanitizzazione
+    );
+
+    // Aggiunge una sezione alla pagina di impostazioni
+    add_settings_section(
+        'cheshire-cat-settings-section', // ID della sezione
+        'Cheshire Cat Connection', // Titolo della sezione
+        'cheshire_plugin_settings_section_callback', // Funzione di callback
+        'cheshire-cat-settings' // Slug della pagina
+    );
+
+    // Aggiunge un campo per l'URL
+    add_settings_field(
+        'cheshire-cat-url', // ID del campo
+        'Cheshire Cat URL', // Titolo del campo
+        'cheshire_plugin_url_callback', // Funzione di callback
+        'cheshire-cat-settings', // Slug della pagina
+        'cheshire-cat-settings-section' // ID della sezione
+    );
+
+    // Aggiunge un campo per il Token
+    add_settings_field(
+        'cheshire-cat-token', // ID del campo
+        'Cheshire Cat Token', // Titolo del campo
+        'cheshire_plugin_token_callback', // Funzione di callback
+        'cheshire-cat-settings', // Slug della pagina
+        'cheshire-cat-settings-section' // ID della sezione
     );
 }
+add_action('admin_init', 'cheshire_plugin_register_settings');
 
-
-/**
- * Register the style and the script
- */
-function cheshire_register_style() {
-    wp_register_style('cheshire-style', plugins_url('src/admin-style.css',__FILE__ ));
-    wp_enqueue_style('cheshire-style');
+// Funzione di callback per la sezione
+function cheshire_plugin_settings_section_callback() {
+    echo '<p>Enter your Cheshire Cat connection details below.</p>';
 }
 
-add_action( 'admin_init','cheshire_register_style');
+// Funzione di callback per il campo URL
+function cheshire_plugin_url_callback() {
+    $url = get_option('cheshire_plugin_url');
+    echo '<input type="text" name="cheshire_plugin_url" value="' . esc_attr($url) . '" size="50" />';
+}
 
+// Funzione di callback per il campo Token
+function cheshire_plugin_token_callback() {
+    $token = get_option('cheshire_plugin_token');
+    echo '<input type="text" name="cheshire_plugin_token" value="' . esc_attr($token) . '" size="50" />';
+}

@@ -6,6 +6,12 @@ namespace Composer\Autoload;
 
 class ComposerStaticInitf6b3560c6290ed7dd01b37bc4f4669a9
 {
+    public static $files = array (
+        '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
+        '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
+        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
+    );
+
     public static $prefixLengthsPsr4 = array (
         'W' => 
         array (
@@ -15,10 +21,21 @@ class ComposerStaticInitf6b3560c6290ed7dd01b37bc4f4669a9
         array (
             'Psr\\Log\\' => 8,
             'Psr\\Http\\Message\\' => 17,
+            'Psr\\Http\\Client\\' => 16,
+            'Phrity\\Util\\' => 12,
+            'Phrity\\Net\\' => 11,
+        ),
+        'G' => 
+        array (
+            'GuzzleHttp\\Psr7\\' => 16,
+            'GuzzleHttp\\Promise\\' => 19,
+            'GuzzleHttp\\' => 11,
         ),
         'C' => 
         array (
             'CheshireCatWp\\' => 14,
+            'CheshireCatSdk\\Facades\\' => 23,
+            'CheshireCatSdk\\' => 15,
         ),
     );
 
@@ -29,22 +46,49 @@ class ComposerStaticInitf6b3560c6290ed7dd01b37bc4f4669a9
         ),
         'Psr\\Log\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
+            0 => __DIR__ . '/..' . '/psr/log/src',
         ),
         'Psr\\Http\\Message\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/http-factory/src',
             1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
+        'Psr\\Http\\Client\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/http-client/src',
+        ),
+        'Phrity\\Util\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phrity/util-errorhandler/src',
+        ),
+        'Phrity\\Net\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phrity/net-uri/src',
+        ),
+        'GuzzleHttp\\Psr7\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
+        ),
+        'GuzzleHttp\\Promise\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/guzzlehttp/promises/src',
+        ),
+        'GuzzleHttp\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/guzzlehttp/guzzle/src',
+        ),
         'CheshireCatWp\\' => 
         array (
             0 => __DIR__ . '/../..' . '/',
         ),
-    );
-
-    public static $fallbackDirsPsr4 = array (
-        0 => __DIR__ . '/..' . '/phrity/net-uri/src',
-        1 => __DIR__ . '/..' . '/phrity/util-errorhandler/src',
+        'CheshireCatSdk\\Facades\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/webgrafia/cheshire-cat-sdk-laravel/src/Facades',
+        ),
+        'CheshireCatSdk\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/webgrafia/cheshire-cat-sdk-laravel/src',
+        ),
     );
 
     public static $classMap = array (
@@ -56,7 +100,6 @@ class ComposerStaticInitf6b3560c6290ed7dd01b37bc4f4669a9
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInitf6b3560c6290ed7dd01b37bc4f4669a9::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInitf6b3560c6290ed7dd01b37bc4f4669a9::$prefixDirsPsr4;
-            $loader->fallbackDirsPsr4 = ComposerStaticInitf6b3560c6290ed7dd01b37bc4f4669a9::$fallbackDirsPsr4;
             $loader->classMap = ComposerStaticInitf6b3560c6290ed7dd01b37bc4f4669a9::$classMap;
 
         }, null, ClassLoader::class);

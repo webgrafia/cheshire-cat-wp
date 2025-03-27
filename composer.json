@@ -3,7 +3,7 @@
     "description": "Cheshire cat integration",
     "type": "library",
     "require": {
-        "textalk/websocket": "^1.6"
+        "webgrafia/cheshire-cat-sdk-laravel": "*"
     },
     "autoload": {
         "psr-4": {
