@@ -1,10 +1,9 @@
 <?php
 
-namespace CheshireCatWp;
+namespace CheshireCatWp\classes;
 
 use CheshireCatSdk\Http\Clients\CheshireCatClient;
 use GuzzleHttp\Client;
-
 class CustomCheshireCatClient extends CheshireCatClient
 {
     protected $baseUrl;
