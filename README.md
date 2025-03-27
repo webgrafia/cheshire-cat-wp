@@ -1,5 +1,7 @@
 # Cheshire Cat WP Plugin
 
+![Cheshire Cat Logo](assets/img/logo-bg.png)
+
 **Cheshire Cat WP** is a WordPress plugin that integrates the [Cheshire Cat AI](https://cheshire-cat.ai/) chatbot into your WordPress website. It allows you to add a conversational AI assistant to your site, providing an interactive and engaging experience for your users.
 
 ## Features
@@ -17,12 +19,11 @@
 1.  **Download:** Download the latest release of the Cheshire Cat WP plugin from the [Releases](https://github.com/your-username/cheshire-cat-wp/releases) page (replace `your-username` with your GitHub username if you plan to host it there).
 2.  **Upload:** Upload the `cheshire-cat-wp` folder to the `/wp-content/plugins/` directory of your WordPress installation.
 3.  **Activate:** Activate the plugin through the 'Plugins' menu in WordPress.
-4. **Install the dependencies:** Run `composer install` in the plugin directory.
 
 ## Configuration
 
 1.  **Cheshire Cat URL and Token:** Go to the WordPress admin panel, then navigate to **Settings -> Cheshire Cat**.
-2.  **Enter your Cheshire Cat URL** (e.g., `ws://your-cheshire-cat-server.com:8080`) and **your API token**.
+2.  **Enter your Cheshire Cat URL** (e.g., `http://localhost:1865`) and **your API token**.
 3.  **Save Changes.**
 
 ## Usage
@@ -31,20 +32,6 @@
 
 2.  **Interact with the Chatbot:** Visit the page where you added the shortcode and start chatting with the Cheshire Cat AI.
 
-## Styling
-
-The plugin includes a default `chat.css` file located in `/assets/css/`. You can customize the look and feel of the chat interface by modifying this file.
-
-**Available CSS Classes:**
-
-*   `#cheshire-chat-container`: The main container for the chat interface.
-*   `#cheshire-chat-messages`: The area where messages are displayed.
-*   `#cheshire-chat-input`: The text input field.
-*   `#cheshire-chat-send`: The send button.
-*   `.user-message`: Styles for messages sent by the user.
-*   `.bot-message`: Styles for messages sent by the bot.
-*   `.error-message`: Styles for error messages.
-*   `.loader`: Styles for the loading indicator.
 
 ## Dependencies
 
@@ -63,7 +50,7 @@ If you'd like to contribute to the development of this plugin, please feel free 
 
 ## License
 
-This plugin is licensed under the GPL2 license.
+This plugin is licensed under the GPL3 license.
 
 ## Support
 
