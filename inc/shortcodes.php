@@ -9,7 +9,7 @@ function cheshire_chat_shortcode()
             <?php \CheshireCatWp\cheshire_display_welcome_message(); ?>
         </div>
         <div id="cheshire-chat-input-container">
-            <input type="text" id="cheshire-chat-input" placeholder="<?php _e('Type your message...', 'cheshire-cat-wp'); ?>">
+            <input type="text" id="cheshire-chat-input" placeholder="<?php esc_attr_e('Type your message...', 'cheshire-cat-wp'); ?>">
             <button id="cheshire-chat-send"></button>
         </div>
     </div>

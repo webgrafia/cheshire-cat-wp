@@ -2,12 +2,16 @@
 /*
 Plugin Name: Cheshire Cat WP
 Description: A WordPress plugin to integrate the Cheshire Cat AI chatbot, offering seamless conversational AI for your site.
-Version: 0.2
+Version: 0.3
 Author: Marco Buttarini
 Author URI: https://bititup.it/
-License: GPL3
+License: GPLv3 or later
+License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Text Domain: cheshire-cat-wp
 Domain Path: /languages
+Requires at least: 5.8
+Requires PHP: 7.4
+Tested up to: 6.5.2
 */
 
 namespace CheshireCatWp;
@@ -32,9 +36,11 @@ function cheshire_enqueue_scripts()
     wp_enqueue_script('cheshire-chat-js', plugins_url('/assets/js/chat.js', __FILE__), array('jquery'), '1.0', true);
     wp_enqueue_style('cheshire-chat-css', plugins_url('/assets/css/chat.css', __FILE__), array(), '1.0');
     wp_localize_script('cheshire-chat-js', 'cheshire_ajax_object', array(
-        'ajax_url' => admin_url('admin-ajax.php')
+        'ajax_url' => admin_url('admin-ajax.php'),
+        'nonce' => wp_create_nonce('cheshire_ajax_nonce')
     ));
-    wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css', array(), '6.5.1');
+
+    wp_enqueue_style('font-awesome-css', plugins_url('/assets/css/font-awesome/all.min.css', __FILE__), array(), '1.0');
 
     // Add dynamic CSS
     wp_add_inline_style('cheshire-chat-css', cheshire_generate_dynamic_css());
