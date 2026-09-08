@@ -99,17 +99,43 @@ function cheshirecat_send_to_declarative_memory( $post_id, $post, $update ) {
         }
     }
 
+    // Schedule asynchronous processing via WP-Cron to prevent blocking admin post saves
+    wp_schedule_single_event( time(), 'cheshirecat_async_send_declarative_memory', array( (int) $post_id, (bool) $update ) );
+    if ( function_exists( 'spawn_cron' ) ) {
+        spawn_cron();
+    }
+}
+
+/**
+ * Async callback for uploading/updating post content in Cheshire Cat declarative memory.
+ *
+ * @since 1.0.4
+ * @param int  $post_id The post ID.
+ * @param bool $update  Whether this is an existing post being updated.
+ * @return void
+ */
+function cheshirecat_async_send_to_declarative_memory( $post_id, $update ) {
+    $post = get_post( $post_id );
+    if ( ! $post || $post->post_status !== 'publish' ) {
+        return;
+    }
+
     // Get Cheshire Cat configuration
     $cheshire_plugin_url = get_option( 'cheshire_plugin_url' );
+    $cheshire_plugin_url_v2 = get_option( 'cheshire_plugin_url_v2', '' );
     $cheshire_plugin_token = get_option( 'cheshire_plugin_token' );
+    $cheshire_plugin_cat_version = get_option( 'cheshire_plugin_cat_version', 'v1' );
+    $cheshire_plugin_api_key = get_option( 'cheshire_plugin_api_key', '' );
+
+    $active_cheshire_url = ( $cheshire_plugin_cat_version === 'v2' ) ? $cheshire_plugin_url_v2 : $cheshire_plugin_url;
 
     // Validate configuration
-    if ( empty( $cheshire_plugin_url ) || empty( $cheshire_plugin_token ) ) {
+    if ( empty( $active_cheshire_url ) || ( $cheshire_plugin_cat_version === 'v1' && empty( $cheshire_plugin_token ) ) || ( $cheshire_plugin_cat_version === 'v2' && empty( $cheshire_plugin_api_key ) ) ) {
         return;
     }
 
     // Initialize Cheshire Cat client
-    $cheshire_cat = new inc\classes\Custom_Cheshire_Cat( $cheshire_plugin_url, $cheshire_plugin_token );
+    $cheshire_cat = new inc\classes\Custom_Cheshire_Cat( $active_cheshire_url, $cheshire_plugin_token, $cheshire_plugin_cat_version, $cheshire_plugin_api_key );
 
     // If this is an update, first delete the existing content from declarative memory
     if ( $update ) {
@@ -314,17 +340,37 @@ function cheshirecat_handle_post_deletion( $post_id ) {
         }
     }
 
+    // Schedule asynchronous processing via WP-Cron to prevent blocking admin post deletion
+    wp_schedule_single_event( time(), 'cheshirecat_async_delete_declarative_memory', array( (int) $post_id ) );
+    if ( function_exists( 'spawn_cron' ) ) {
+        spawn_cron();
+    }
+}
+
+/**
+ * Async callback for removing post content from Cheshire Cat declarative memory on post deletion.
+ *
+ * @since 1.0.4
+ * @param int $post_id The post ID.
+ * @return void
+ */
+function cheshirecat_async_delete_from_declarative_memory( $post_id ) {
     // Get Cheshire Cat configuration
     $cheshire_plugin_url = get_option( 'cheshire_plugin_url' );
+    $cheshire_plugin_url_v2 = get_option( 'cheshire_plugin_url_v2', '' );
     $cheshire_plugin_token = get_option( 'cheshire_plugin_token' );
+    $cheshire_plugin_cat_version = get_option( 'cheshire_plugin_cat_version', 'v1' );
+    $cheshire_plugin_api_key = get_option( 'cheshire_plugin_api_key', '' );
+
+    $active_cheshire_url = ( $cheshire_plugin_cat_version === 'v2' ) ? $cheshire_plugin_url_v2 : $cheshire_plugin_url;
 
     // Validate configuration
-    if ( empty( $cheshire_plugin_url ) || empty( $cheshire_plugin_token ) ) {
+    if ( empty( $active_cheshire_url ) || ( $cheshire_plugin_cat_version === 'v1' && empty( $cheshire_plugin_token ) ) || ( $cheshire_plugin_cat_version === 'v2' && empty( $cheshire_plugin_api_key ) ) ) {
         return;
     }
 
     // Initialize Cheshire Cat client
-    $cheshire_cat = new inc\classes\Custom_Cheshire_Cat( $cheshire_plugin_url, $cheshire_plugin_token );
+    $cheshire_cat = new inc\classes\Custom_Cheshire_Cat( $active_cheshire_url, $cheshire_plugin_token, $cheshire_plugin_cat_version, $cheshire_plugin_api_key );
 
     // Delete the content from declarative memory
     cheshirecat_delete_from_declarative_memory( $post_id, $cheshire_cat );
@@ -380,17 +426,37 @@ function cheshirecat_handle_post_trash( $new_status, $old_status, $post ) {
         return;
     }
 
+    // Schedule asynchronous processing via WP-Cron to prevent blocking admin post trashing
+    wp_schedule_single_event( time(), 'cheshirecat_async_trash_declarative_memory', array( (int) $post_id ) );
+    if ( function_exists( 'spawn_cron' ) ) {
+        spawn_cron();
+    }
+}
+
+/**
+ * Async callback for removing post content from Cheshire Cat declarative memory when trashed.
+ *
+ * @since 1.0.4
+ * @param int $post_id The post ID.
+ * @return void
+ */
+function cheshirecat_async_trash_from_declarative_memory( $post_id ) {
     // Get Cheshire Cat configuration
     $cheshire_plugin_url = get_option( 'cheshire_plugin_url' );
+    $cheshire_plugin_url_v2 = get_option( 'cheshire_plugin_url_v2', '' );
     $cheshire_plugin_token = get_option( 'cheshire_plugin_token' );
+    $cheshire_plugin_cat_version = get_option( 'cheshire_plugin_cat_version', 'v1' );
+    $cheshire_plugin_api_key = get_option( 'cheshire_plugin_api_key', '' );
+
+    $active_cheshire_url = ( $cheshire_plugin_cat_version === 'v2' ) ? $cheshire_plugin_url_v2 : $cheshire_plugin_url;
 
     // Validate configuration
-    if ( empty( $cheshire_plugin_url ) || empty( $cheshire_plugin_token ) ) {
+    if ( empty( $active_cheshire_url ) || ( $cheshire_plugin_cat_version === 'v1' && empty( $cheshire_plugin_token ) ) || ( $cheshire_plugin_cat_version === 'v2' && empty( $cheshire_plugin_api_key ) ) ) {
         return;
     }
 
     // Initialize Cheshire Cat client
-    $cheshire_cat = new inc\classes\Custom_Cheshire_Cat( $cheshire_plugin_url, $cheshire_plugin_token );
+    $cheshire_cat = new inc\classes\Custom_Cheshire_Cat( $active_cheshire_url, $cheshire_plugin_token, $cheshire_plugin_cat_version, $cheshire_plugin_api_key );
 
     // Delete the content from declarative memory
     cheshirecat_delete_from_declarative_memory( $post_id, $cheshire_cat );
@@ -409,6 +475,11 @@ add_action('before_delete_post', __NAMESPACE__ . '\cheshirecat_handle_post_delet
 
 // Hook into post status transition to handle trashing
 add_action('transition_post_status', __NAMESPACE__ . '\cheshirecat_handle_post_trash', 10, 3);
+
+// Async WP-Cron action hooks for non-blocking execution
+add_action('cheshirecat_async_send_declarative_memory', __NAMESPACE__ . '\cheshirecat_async_send_to_declarative_memory', 10, 2);
+add_action('cheshirecat_async_delete_declarative_memory', __NAMESPACE__ . '\cheshirecat_async_delete_from_declarative_memory', 10, 1);
+add_action('cheshirecat_async_trash_declarative_memory', __NAMESPACE__ . '\cheshirecat_async_trash_from_declarative_memory', 10, 1);
 
 /**
  * AJAX handler for getting the count of posts to process.
@@ -518,18 +589,24 @@ function cheshirecat_process_posts_batch() {
         return;
     }
 
-    // Get Cheshire Cat configuration
+        // Get Cheshire Cat configuration
     $cheshire_plugin_url = get_option('cheshire_plugin_url');
+    $cheshire_plugin_url_v2 = get_option('cheshire_plugin_url_v2', '');
     $cheshire_plugin_token = get_option('cheshire_plugin_token');
+    $cheshire_plugin_cat_version = get_option('cheshire_plugin_cat_version', 'v1');
+    $cheshire_plugin_api_key = get_option('cheshire_plugin_api_key', '');
+
+    // Select active URL based on version
+    $active_cheshire_url = ($cheshire_plugin_cat_version === 'v2') ? $cheshire_plugin_url_v2 : $cheshire_plugin_url;
 
     // Validate configuration
-    if (empty($cheshire_plugin_url) || empty($cheshire_plugin_token)) {
+    if (empty($active_cheshire_url) || ($cheshire_plugin_cat_version === 'v1' && empty($cheshire_plugin_token)) || ($cheshire_plugin_cat_version === 'v2' && empty($cheshire_plugin_api_key))) {
         wp_send_json_error(array('message' => 'Cheshire Cat is not properly configured'));
         return;
     }
 
     // Initialize Cheshire Cat client
-    $cheshire_cat = new inc\classes\Custom_Cheshire_Cat($cheshire_plugin_url, $cheshire_plugin_token);
+    $cheshire_cat = new inc\classes\Custom_Cheshire_Cat($active_cheshire_url, $cheshire_plugin_token, $cheshire_plugin_cat_version, $cheshire_plugin_api_key);
 
     // Process each post
     $processed = 0;

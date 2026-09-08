@@ -49,17 +49,22 @@ function cheshirecat_process_message() {
 
 
     // Get Cheshire Cat configuration.
-    $cheshire_plugin_url   = get_option( 'cheshire_plugin_url' );
-    $cheshire_plugin_token = get_option( 'cheshire_plugin_token' );
+    $cheshire_plugin_url = get_option('cheshire_plugin_url');
+    $cheshire_plugin_token = get_option('cheshire_plugin_token');
+    $cheshire_plugin_cat_version = get_option('cheshire_plugin_cat_version', 'v1');
+    $cheshire_plugin_api_key = get_option('cheshire_plugin_api_key', '');
+    $cheshire_plugin_url_v2 = get_option('cheshire_plugin_url_v2', '');
+    // Select active URL based on version
+    $active_cheshire_url = ($cheshire_plugin_cat_version === 'v2') ? $cheshire_plugin_url_v2 : $cheshire_plugin_url;
 
     // Validate configuration.
-    if ( empty( $cheshire_plugin_url ) || empty( $cheshire_plugin_token ) ) {
-        wp_send_json_error( __( 'Cheshire Cat URL or Token not set.', 'cheshire-cat-chatbot' ) );
+    if (empty($active_cheshire_url) || ($cheshire_plugin_cat_version === 'v1' && empty($cheshire_plugin_token)) || ($cheshire_plugin_cat_version === 'v2' && empty($cheshire_plugin_api_key))) {
+        wp_send_json_error(__('Cheshire Cat URL or Authentication credentials not set.', 'cheshire-cat-chatbot'));
         return;
     }
 
     // Initialize Cheshire Cat client.
-    $cheshire_cat = new inc\classes\Custom_Cheshire_Cat( $cheshire_plugin_url, $cheshire_plugin_token );
+    $cheshire_cat = new inc\classes\Custom_Cheshire_Cat($active_cheshire_url, $cheshire_plugin_token, $cheshire_plugin_cat_version, $cheshire_plugin_api_key);
 
     // Set page context information
     $cheshire_cat->setPageContext($page_id, $page_url);
@@ -149,9 +154,14 @@ function cheshirecat_get_context_information() {
     // Get Cheshire Cat configuration.
     $cheshire_plugin_url   = get_option( 'cheshire_plugin_url' );
     $cheshire_plugin_token = get_option( 'cheshire_plugin_token' );
+    $cheshire_plugin_cat_version = get_option('cheshire_plugin_cat_version', 'v1');
+    $cheshire_plugin_api_key = get_option('cheshire_plugin_api_key', '');
+    $cheshire_plugin_url_v2 = get_option('cheshire_plugin_url_v2', '');
+    // Select active URL based on version
+    $active_cheshire_url = ($cheshire_plugin_cat_version === 'v2') ? $cheshire_plugin_url_v2 : $cheshire_plugin_url;
 
     // Create an instance of Custom_Cheshire_Cat
-    $cheshire_cat = new inc\classes\Custom_Cheshire_Cat( $cheshire_plugin_url, $cheshire_plugin_token );
+    $cheshire_cat = new inc\classes\Custom_Cheshire_Cat( $active_cheshire_url, $cheshire_plugin_token, $cheshire_plugin_cat_version, $cheshire_plugin_api_key );
 
     // Set page context information
     $cheshire_cat->setPageContext($page_id, $page_url);

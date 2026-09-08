@@ -192,13 +192,13 @@ The plugin provides hooks for developers to extend its functionality (coming in 
 
 ## Current Version
 
-The current stable version is 0.9.4, which includes:
+The current stable version is 1.0.4, which includes:
 
-* Add support for predefined responses in WooCommerce product categories
-* Admin configuration for category-specific responses
-* Ability to limit predefined questions displayed
-* Backend updates for retrieving and processing these responses
-* All the features from previous versions including declarative memory sync and WooCommerce integration
+* Fix: Prevented WordPress admin post/product saving freeze when Cheshire Cat server is offline or slow by implementing HTTP client connection timeouts and asynchronous WP-Cron processing for declarative memory operations
+* Optimization: Conditional enqueuing of frontend JavaScript and CSS assets (only on pages where chatbot or interactive predefined responses are enabled/displayed)
+* Performance: Improved page load speeds and Core Web Vitals for pages where the chatbot is inactive or restricted
+* New: Option to show a guest preview of the chatbot when access is restricted to logged-in users
+* All the features from previous versions including built-in themes, declarative memory sync and WooCommerce integration
 
 For a complete history of changes, please see the [Changelog](https://wordpress.org/plugins/cheshire-cat-chatbot/#developers) on the WordPress plugin page.
 

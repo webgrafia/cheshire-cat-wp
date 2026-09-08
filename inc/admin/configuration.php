@@ -82,6 +82,20 @@ function cheshirecat_configuration_page()
             update_option('cheshire_plugin_logged_in_only', 'off');
         }
 
+        // Show preview to logged-out users
+        if (isset($_POST['cheshire_plugin_show_preview_logged_out'])) {
+            $cheshire_plugin_show_preview_logged_out = sanitize_text_field(wp_unslash($_POST['cheshire_plugin_show_preview_logged_out']));
+            update_option('cheshire_plugin_show_preview_logged_out', $cheshire_plugin_show_preview_logged_out);
+        } else {
+            update_option('cheshire_plugin_show_preview_logged_out', 'off');
+        }
+
+        if (isset($_POST['cheshire_plugin_preview_text_logged_out'])) {
+            // allowing html
+            $cheshire_plugin_preview_text_logged_out = wp_kses_post(wp_unslash($_POST['cheshire_plugin_preview_text_logged_out']));
+            update_option('cheshire_plugin_preview_text_logged_out', $cheshire_plugin_preview_text_logged_out);
+        }
+
         // Reinforcement message
         if (isset($_POST['cheshire_plugin_enable_reinforcement'])) {
             $cheshire_plugin_enable_reinforcement = sanitize_text_field(wp_unslash($_POST['cheshire_plugin_enable_reinforcement']));
@@ -162,6 +176,8 @@ function cheshirecat_configuration_page()
     $cheshire_plugin_enable_context = get_option('cheshire_plugin_enable_context', 'off');
     $cheshire_plugin_default_state = get_option('cheshire_plugin_default_state', 'open');
     $cheshire_plugin_logged_in_only = get_option('cheshire_plugin_logged_in_only', 'off');
+    $cheshire_plugin_show_preview_logged_out = get_option('cheshire_plugin_show_preview_logged_out', 'off');
+    $cheshire_plugin_preview_text_logged_out = get_option('cheshire_plugin_preview_text_logged_out', '');
     $cheshire_plugin_enable_reinforcement = get_option('cheshire_plugin_enable_reinforcement', 'off');
     $cheshire_plugin_reinforcement_message = get_option('cheshire_plugin_reinforcement_message', 'reply with short sentences');
     $cheshire_plugin_content_type_mode = get_option('cheshire_plugin_content_type_mode', 'site_wide');
@@ -193,9 +209,20 @@ function cheshirecat_configuration_page()
                 <tr valign="top">
                     <th scope="row"><?php esc_html_e('Logged-in Users Only', 'cheshire-cat-chatbot'); ?></th>
                     <td>
-                        <input type="checkbox" name="cheshire_plugin_logged_in_only" <?php checked($cheshire_plugin_logged_in_only, 'on'); ?> />
+                        <input type="checkbox" id="cheshire_plugin_logged_in_only" name="cheshire_plugin_logged_in_only" <?php checked($cheshire_plugin_logged_in_only, 'on'); ?> />
                         <label for="cheshire_plugin_logged_in_only"><?php esc_html_e('Show chat only to logged-in users', 'cheshire-cat-chatbot'); ?></label>
                         <p class="description"><?php esc_html_e('Check this box to show the chat only to users who are logged in to your WordPress site.', 'cheshire-cat-chatbot'); ?></p>
+
+                        <div id="logged_in_only_options" style="margin-top: 15px; <?php echo $cheshire_plugin_logged_in_only !== 'on' ? 'display:none;' : ''; ?>">
+                            <div style="margin-bottom: 10px;">
+                                <input type="checkbox" id="cheshire_plugin_show_preview_logged_out" name="cheshire_plugin_show_preview_logged_out" <?php checked($cheshire_plugin_show_preview_logged_out, 'on'); ?> />
+                                <label for="cheshire_plugin_show_preview_logged_out"><?php esc_html_e('mostra anteprima ai non registrati', 'cheshire-cat-chatbot'); ?></label>
+                            </div>
+                            <div id="preview_text_option" style="<?php echo $cheshire_plugin_show_preview_logged_out !== 'on' ? 'display:none;' : ''; ?>">
+                                <label for="cheshire_plugin_preview_text_logged_out"><?php esc_html_e('Testo anteprima (HTML consentito):', 'cheshire-cat-chatbot'); ?></label><br>
+                                <textarea name="cheshire_plugin_preview_text_logged_out" id="cheshire_plugin_preview_text_logged_out" rows="4" style="width: 100%; max-width: 400px;"><?php echo esc_textarea($cheshire_plugin_preview_text_logged_out); ?></textarea>
+                            </div>
+                        </div>
                     </td>
                 </tr>
                 <tr valign="top">
@@ -413,6 +440,24 @@ function cheshirecat_configuration_page()
                             $('#declarative_memory_options').show();
                         } else {
                             $('#declarative_memory_options').hide();
+                        }
+                    });
+
+                    // Toggle logged-in only options
+                    $('#cheshire_plugin_logged_in_only').change(function() {
+                        if ($(this).is(':checked')) {
+                            $('#logged_in_only_options').show();
+                        } else {
+                            $('#logged_in_only_options').hide();
+                        }
+                    });
+
+                    // Toggle preview text option
+                    $('#cheshire_plugin_show_preview_logged_out').change(function() {
+                        if ($(this).is(':checked')) {
+                            $('#preview_text_option').show();
+                        } else {
+                            $('#preview_text_option').hide();
                         }
                     });
                 });

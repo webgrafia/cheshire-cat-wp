@@ -3,8 +3,8 @@ Contributors: webgrafia
 Tags: chatbot, ai, cheshire cat, chat, assistant
 Requires at least: 5.8
 Requires PHP: 7.4
-Tested up to: 6.8
-Stable tag: 0.9.9
+Tested up to: 7.1
+Stable tag: 2.0.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -29,34 +29,20 @@ A WordPress plugin to integrate the Cheshire Cat AI chatbot, offering seamless c
 
 == Installation ==
 
-1.  Upload the `cheshire-cat-chatbot` folder to the `/wp-content/plugins/` directory of your WordPress installation.
-2.  Activate the plugin through the 'Plugins' menu in WordPress.
-3.  Go to the WordPress admin panel, then navigate to **Settings -> Cheshire Cat**.
-4.  Enter your Cheshire Cat URL (e.g., `http://localhost:1865`) and your API token.
-5.  Save Changes.
-
-== Usage ==
-
-1.  **Add the Shortcode:** To add the chat interface to a page or post, use the `[cheshire_chat]` shortcode.
-2.  **Interact with the Chatbot:** Visit the page where you added the shortcode and start chatting with the Cheshire Cat AI.
-3.  **Enable Global Chat:** If you want the chat to appear on every page of your website, you can enable the "Global Chat" option in the **Settings -> Cheshire Cat** section.
-4.  **Use the TinyMCE Editor Button:** When editing a post or page, you'll see a Cheshire Cat button in the editor toolbar. Click it to open a dialog where you can enter a prompt. The AI-generated response will be inserted directly into your content.
+1. Upload the `cheshire-cat-chatbot` directory to the `/wp-content/plugins/` directory.
+2. Activate the plugin through the 'Plugins' menu in WordPress.
+3. Go to **Settings -> Cheshire Cat** to configure the plugin options.
+4. Use the `[cheshire_cat]` shortcode to display the chatbot on any page or post.
 
 == Frequently Asked Questions ==
 
-= What is Cheshire Cat AI? =
+= How do I configure the plugin? =
+Go to **Settings -> Cheshire Cat** in your WordPress admin dashboard. You'll need to provide your Cheshire Cat instance URL and authentication token.
 
-Cheshire Cat AI is an open-source AI chatbot platform. You need to have a running instance of Cheshire Cat AI to use this plugin.
+= Can I use a shortcode to display the chat? =
+Yes, you can use the `[cheshire_cat]` shortcode on any page or post.
 
-= Where can I find my Cheshire Cat URL and Token? =
-
-You can find these details in your Cheshire Cat AI instance's configuration.
-
-= How do I customize the chat interface? =
-
-You can customize the chat interface's colors and font in the **Settings -> Cheshire Cat** section of your WordPress admin panel.
-
-= Can I use the chat on every page? =
+= Can I enable the chat globally on all pages? =
 Yes, you can enable the "Global Chat" option in the **Settings -> Cheshire Cat** section.
 
 = Can I customize the avatar image? =
@@ -82,6 +68,34 @@ When editing a post or page, you'll see a Cheshire Cat button in the editor tool
 7.  Chatbot in Editor
 
 == Changelog ==
+
+= 2.0.1 =
+* New: Added support for Cheshire Cat AI v2 with dedicated endpoint URL and API Key authentication.
+* New: Added support for WebSocket authentication with API Key for Cheshire Cat v2.
+* Improvement: WooCommerce single product pages now inherit predefined questions from the highest-level (root) product category when no specific questions are set for the product.
+* Security: Removed debug console logging of configuration objects containing authentication tokens.
+
+= 1.0.4 =
+* Fix: Prevented WordPress admin post/product saving freeze when Cheshire Cat server is offline or slow by implementing HTTP client connection timeouts and asynchronous WP-Cron processing for declarative memory operations.
+
+= 1.0.3 =
+* Optimization: Conditional enqueuing of frontend JavaScript and CSS assets (only on pages where chatbot or interactive predefined responses are enabled/displayed)
+* Performance: Improved page load speeds and Core Web Vitals for pages where the chatbot is inactive or restricted
+
+= 1.0.2 =
+* New: Added option to show a guest preview of the chatbot when access is restricted to logged-in users
+* New: Added customizable preview text for guest users (HTML supported)
+* Improvement: Enhanced UI for the chatbot preview mode
+
+= 1.0.1 =
+* Fix: Minor admin Style preview text/labels adjustments (ARIA label, sample texts) for consistency
+* Misc: Copy cleanup in preview (removed outdated error sample)
+
+= 1.0 =
+* New: Built-in chat themes (blue, green, red, yellow, light, dark, cerama) for quicker styling
+* Improvement: Refined admin styles and new admin script for better UX
+* Improvement: Chat UI polish and minor style fixes
+* Misc: Internal refactors and preparations for the 1.0 release
 
 = 0.9.9 =
 * Fix: Skip post deletion actions for Customizer and unsupported post types
@@ -254,6 +268,9 @@ When editing a post or page, you'll see a Cheshire Cat button in the editor tool
 *   Shortcode for adding the chat to pages and posts.
 
 == Upgrade Notice ==
+
+= 1.0.2 =
+New: Added guest preview mode for non-registered users and customizable preview text.
 
 = 0.9.3 =
 Feature update: Added support for predefined responses in WooCommerce product categories, including admin configuration for category-specific responses, the ability to limit predefined questions displayed, and backend updates for retrieving and processing these responses.

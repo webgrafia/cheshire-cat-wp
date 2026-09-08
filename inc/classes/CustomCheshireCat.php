@@ -356,6 +356,7 @@ class Custom_Cheshire_Cat extends CheshireCat {
 
         return $context;
     }
+
     /**
      * Base URL for the Cheshire Cat API.
      *
@@ -373,6 +374,22 @@ class Custom_Cheshire_Cat extends CheshireCat {
     protected $token;
 
     /**
+     * API Key for the Cheshire Cat API (v2).
+     *
+     * @since 1.1.0
+     * @var string
+     */
+    protected $api_key;
+
+    /**
+     * Cheshire Cat version (v1 or v2).
+     *
+     * @since 1.1.0
+     * @var string
+     */
+    protected $cat_version;
+
+    /**
      * HTTP client instance.
      *
      * @since 0.1
@@ -384,13 +401,17 @@ class Custom_Cheshire_Cat extends CheshireCat {
      * Constructor.
      *
      * @since 0.1
-     * @param string $base_url The base URL for the Cheshire Cat API.
-     * @param string $token    The authentication token.
+     * @param string $base_url     The base URL for the Cheshire Cat API.
+     * @param string $token        The authentication token (v1).
+     * @param string $cat_version  Cheshire Cat version: 'v1' or 'v2'. Default 'v1'.
+     * @param string $api_key      API Key for v2 authentication. Default ''.
      */
-    public function __construct( $base_url, $token ) {
-        $this->base_url = $base_url;
-        $this->token    = $token;
-        $this->client   = $this->create_client();
+    public function __construct( $base_url, $token, $cat_version = 'v1', $api_key = '' ) {
+        $this->base_url    = $base_url;
+        $this->token       = $token;
+        $this->cat_version = $cat_version;
+        $this->api_key     = $api_key;
+        $this->client      = $this->create_client();
     }
 
     /**
@@ -400,7 +421,7 @@ class Custom_Cheshire_Cat extends CheshireCat {
      * @return Custom_Cheshire_Cat_Client The client instance.
      */
     protected function create_client() {
-        return new Custom_Cheshire_Cat_Client( $this->base_url, $this->token );
+        return new Custom_Cheshire_Cat_Client( $this->base_url, $this->token, $this->cat_version, $this->api_key );
     }
 
     /**

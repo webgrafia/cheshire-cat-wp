@@ -59,6 +59,43 @@ function cheshirecat_get_predefined_responses_with_override( $post_id = 0, $is_p
                 return $process_responses( $responses );
             }
         }
+
+        // If no post-specific responses, check if this is a WooCommerce product with category responses
+        if ( function_exists( 'get_the_terms' ) ) {
+            $product_categories = get_the_terms( $post_id, 'product_cat' );
+
+            if ( ! empty( $product_categories ) && ! is_wp_error( $product_categories ) ) {
+                $top_level_category_ids = array();
+
+                foreach ( $product_categories as $cat ) {
+                    if ( $cat->parent == 0 ) {
+                        $top_level_category_ids[] = $cat->term_id;
+                    } else {
+                        $ancestors = get_ancestors( $cat->term_id, 'product_cat', 'taxonomy' );
+                        if ( ! empty( $ancestors ) ) {
+                            // The last element in the ancestors array is the highest-level (root) ancestor
+                            $top_level_category_ids[] = end( $ancestors );
+                        } else {
+                            $top_level_category_ids[] = $cat->term_id;
+                        }
+                    }
+                }
+
+                $top_level_category_ids = array_unique( $top_level_category_ids );
+
+                foreach ( $top_level_category_ids as $top_cat_id ) {
+                    $category_specific_responses = get_term_meta( $top_cat_id, '_cheshire_predefined_responses', true );
+
+                    if ( ! empty( $category_specific_responses ) ) {
+                        $responses = array_filter( explode( "\n", $category_specific_responses ), 'trim' );
+
+                        if ( ! empty( $responses ) ) {
+                            return $process_responses( $responses );
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // Check if we're in a product category archive

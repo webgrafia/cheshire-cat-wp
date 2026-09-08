@@ -12,8 +12,20 @@ function cheshirecat_chat_shortcode()
 {
     // Check if chat should only be shown to logged-in users
     $logged_in_only = get_option('cheshire_plugin_logged_in_only', 'off');
+    $show_preview_logged_out = get_option('cheshire_plugin_show_preview_logged_out', 'off');
+    $is_preview = false;
+
     if ($logged_in_only === 'on' && !is_user_logged_in()) {
-        return '';
+        if ($show_preview_logged_out === 'on') {
+            $is_preview = true;
+        } else {
+            return '';
+        }
+    }
+
+    // Ensure frontend scripts and styles are enqueued when shortcode is executed
+    if ( ! wp_script_is( 'cheshire-chat-js', 'enqueued' ) ) {
+        cheshirecat_enqueue_scripts();
     }
 
     ob_start();
@@ -28,6 +40,9 @@ function cheshirecat_chat_shortcode()
 
     // Combine classes
     $container_classes = trim($avatar_class . ' ' . $state_class);
+    if ($is_preview) {
+        $container_classes .= ' cheshire-preview-only';
+    }
 
     $avatar_image = get_option('cheshire_chat_avatar_image', '');
     $default_avatar = CHESHIRE_CAT_PLUGIN_URL . 'assets/img/default-avatar.svg';
@@ -70,8 +85,12 @@ function cheshirecat_add_global_chat()
 
     // Check if chat should only be shown to logged-in users
     $logged_in_only = get_option('cheshire_plugin_logged_in_only', 'off');
+    $show_preview_logged_out = get_option('cheshire_plugin_show_preview_logged_out', 'off');
+
     if ($logged_in_only === 'on' && !is_user_logged_in()) {
-        return;
+        if ($show_preview_logged_out !== 'on') {
+            return;
+        }
     }
 
     // Get content type mode

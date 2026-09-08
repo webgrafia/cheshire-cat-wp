@@ -21,15 +21,21 @@ function cheshirecat_declarative_memory_sync_page()
     $post_types = get_post_types(array('public' => true), 'objects');
 
     // Get Cheshire Cat configuration
+    $cheshire_plugin_cat_version = get_option('cheshire_plugin_cat_version', 'v1');
     $cheshire_plugin_url = get_option('cheshire_plugin_url');
+    $cheshire_plugin_url_v2 = get_option('cheshire_plugin_url_v2', '');
     $cheshire_plugin_token = get_option('cheshire_plugin_token');
+    $cheshire_plugin_api_key = get_option('cheshire_plugin_api_key', '');
     $enable_declarative_memory = get_option('cheshire_plugin_enable_declarative_memory', 'off');
 
     // Check if declarative memory is enabled
     $is_declarative_memory_enabled = ($enable_declarative_memory === 'on');
 
     // Check if Cheshire Cat is configured
-    $is_cheshire_cat_configured = (!empty($cheshire_plugin_url) && !empty($cheshire_plugin_token));
+    $active_cheshire_url = ($cheshire_plugin_cat_version === 'v2') ? $cheshire_plugin_url_v2 : $cheshire_plugin_url;
+    $is_cheshire_cat_configured = ($cheshire_plugin_cat_version === 'v2')
+        ? (!empty($active_cheshire_url) && !empty($cheshire_plugin_api_key))
+        : (!empty($active_cheshire_url) && !empty($cheshire_plugin_token));
 
     ?>
     <div class="wrap cheshire-admin">

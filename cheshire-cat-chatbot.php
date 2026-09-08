@@ -11,7 +11,7 @@
  * Plugin Name:       Cheshire Cat Chatbot
  * Plugin URI:        https://cheshirecat.ai/
  * Description:       A WordPress plugin to integrate the Cheshire Cat AI chatbot, offering seamless conversational AI for your site.
- * Version:           0.9.9
+ * Version:           2.0.1
  * Author:            Marco Buttarini
  * Author URI:        https://bititup.it/
  * License:           GPL-3.0-or-later
@@ -20,7 +20,7 @@
  * Domain Path:       /languages
  * Requires at least: 5.8
  * Requires PHP:      7.4
- * Tested up to:      6.8
+ * Tested up to:      7.1
  */
 
 namespace webgrafia\cheshirecat;
@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define plugin constants.
-define( 'CHESHIRE_CAT_VERSION', '0.9.9' );
+define( 'CHESHIRE_CAT_VERSION', '2.0.1' );
 define( 'CHESHIRE_CAT_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CHESHIRE_CAT_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
@@ -161,8 +161,12 @@ function cheshirecat_is_chatbot_enabled_on_page() {
 
     // Check if chat should only be shown to logged-in users
     $logged_in_only = get_option('cheshire_plugin_logged_in_only', 'off');
+    $show_preview_logged_out = get_option('cheshire_plugin_show_preview_logged_out', 'off');
+
     if ($logged_in_only === 'on' && !is_user_logged_in()) {
-        return false;
+        if ($show_preview_logged_out !== 'on') {
+            return false;
+        }
     }
 
     // Get content type mode
@@ -214,28 +218,96 @@ function cheshirecat_is_chatbot_enabled_on_page() {
 }
 
 /**
+ * Determine whether frontend scripts and styles should be enqueued.
+ *
+ * @since 1.0.3
+ * @return bool Whether to enqueue scripts/styles on current request.
+ */
+function cheshirecat_should_enqueue_scripts() {
+    // 1. Check if global chatbot is enabled on current page
+    if ( cheshirecat_is_chatbot_enabled_on_page() ) {
+        return true;
+    }
+
+    // 2. Check if the page/post contains the [cheshire_chat] shortcode
+    if ( is_singular() ) {
+        global $post;
+        if ( $post && has_shortcode( $post->post_content, 'cheshire_chat' ) ) {
+            $logged_in_only = get_option( 'cheshire_plugin_logged_in_only', 'off' );
+            $show_preview_logged_out = get_option( 'cheshire_plugin_show_preview_logged_out', 'off' );
+
+            if ( $logged_in_only === 'on' && ! is_user_logged_in() ) {
+                if ( $show_preview_logged_out === 'on' ) {
+                    return true;
+                }
+            } else {
+                return true;
+            }
+        }
+    }
+
+    // 3. Check if predefined responses in content are enabled and present for this post/product
+    $show_predefined_in_content = get_option( 'cheshire_plugin_show_predefined_in_content', 'off' );
+    if ( $show_predefined_in_content === 'on' ) {
+        $logged_in_only = get_option( 'cheshire_plugin_logged_in_only', 'off' );
+        $show_preview_logged_out = get_option( 'cheshire_plugin_show_preview_logged_out', 'off' );
+
+        $can_show_predefined = true;
+        if ( $logged_in_only === 'on' && ! is_user_logged_in() && $show_preview_logged_out === 'off' ) {
+            $can_show_predefined = false;
+        }
+
+        if ( $can_show_predefined && is_singular() ) {
+            $post_type = get_post_type();
+            $enabled_post_types = get_option( 'cheshire_plugin_enabled_post_types', array( 'post', 'page' ) );
+
+            if ( in_array( $post_type, $enabled_post_types ) && ! ( function_exists( 'is_product' ) && is_product() ) ) {
+                $responses = cheshirecat_get_predefined_responses_with_override( get_the_ID() );
+                if ( ! empty( $responses ) ) {
+                    return true;
+                }
+            }
+
+            if ( function_exists( 'is_product' ) && is_product() && class_exists( 'WooCommerce' ) && in_array( 'product', $enabled_post_types ) ) {
+                $responses = cheshirecat_get_predefined_responses_with_override( get_the_ID() );
+                if ( ! empty( $responses ) ) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+/**
  * Enqueue scripts and styles for the frontend.
  *
  * @since 0.1
  * @return void
  */
 function cheshirecat_enqueue_scripts() {
+    // Only enqueue if chatbot or interactive features are usable on this page
+    if ( ! cheshirecat_should_enqueue_scripts() ) {
+        return;
+    }
+
     $version = CHESHIRE_CAT_VERSION;
 
     // Enqueue main chat script.
     wp_enqueue_script(
-        'cheshire-chat-js', 
-        CHESHIRE_CAT_PLUGIN_URL . 'assets/js/chat.js', 
-        array( 'jquery' ), 
-        $version, 
+        'cheshire-chat-js',
+        CHESHIRE_CAT_PLUGIN_URL . 'assets/js/chat.js',
+        array( 'jquery' ),
+        $version,
         true
     );
 
     // Enqueue main chat styles.
     wp_enqueue_style(
-        'cheshire-chat-css', 
-        CHESHIRE_CAT_PLUGIN_URL . 'assets/css/chat.css', 
-        array(), 
+        'cheshire-chat-css',
+        CHESHIRE_CAT_PLUGIN_URL . 'assets/css/chat.css',
+        array(),
         $version
     );
 
@@ -252,8 +324,14 @@ function cheshirecat_enqueue_scripts() {
     $default_state = get_option('cheshire_plugin_default_state', 'open');
     $enable_websocket = get_option('cheshire_plugin_enable_websocket', 'off');
     $cheshire_plugin_url = get_option('cheshire_plugin_url', '');
+    $cheshire_plugin_url_v2 = get_option('cheshire_plugin_url_v2', '');
     $cheshire_plugin_websocket_url = get_option('cheshire_plugin_websocket_url', '');
     $cheshire_plugin_token = get_option('cheshire_plugin_token', '');
+    $cheshire_plugin_cat_version = get_option('cheshire_plugin_cat_version', 'v1');
+    $cheshire_plugin_api_key = get_option('cheshire_plugin_api_key', '');
+
+    // Seleziona l'URL corretto in base alla versione attiva
+    $active_cheshire_url = ( $cheshire_plugin_cat_version === 'v2' ) ? $cheshire_plugin_url_v2 : $cheshire_plugin_url;
 
     // Get context and reinforcement settings
     $enable_context = get_option('cheshire_plugin_enable_context', 'off');
@@ -280,17 +358,26 @@ function cheshirecat_enqueue_scripts() {
     $is_chatbot_enabled = cheshirecat_is_chatbot_enabled_on_page();
 
     // Localize script with AJAX data.
+    // Security: token and api_key are only exposed to the frontend JS when WebSocket
+    // is enabled, because that is the only mode where the browser connects directly
+    // to Cheshire Cat and needs to authenticate itself. In REST/AJAX mode the PHP
+    // backend handles authentication server-side, so there is no reason to leak
+    // credentials into the page source.
+    $ws_active = ( $enable_websocket === 'on' );
     wp_localize_script(
-        'cheshire-chat-js', 
-        'cheshire_ajax_object', 
+        'cheshire-chat-js',
+        'cheshire_ajax_object',
         array(
             'ajax_url' => admin_url( 'admin-ajax.php' ),
             'nonce'    => wp_create_nonce( 'cheshire_ajax_nonce' ),
             'page_id'  => $current_page_id,
             'default_state' => $default_state,
             'enable_websocket' => $enable_websocket,
-            'cheshire_url' => $cheshire_plugin_url,
-            'token' => $cheshire_plugin_token,
+            'cheshire_url' => $active_cheshire_url,
+            // Only expose credentials when WebSocket is active (browser connects directly)
+            'token'   => $ws_active ? $cheshire_plugin_token   : '',
+            'api_key' => $ws_active ? $cheshire_plugin_api_key : '',
+            'cat_version' => $cheshire_plugin_cat_version,
             // Add context and reinforcement settings for WebSocket
             'enable_context' => $enable_context,
             'enable_reinforcement' => $enable_reinforcement,
@@ -304,17 +391,25 @@ function cheshirecat_enqueue_scripts() {
             // Add product category information
             'is_product_category' => $is_product_category,
             'product_category_id' => $product_category_id,
+            // Add preview settings
+            'is_preview' => (get_option('cheshire_plugin_logged_in_only', 'off') === 'on' && !is_user_logged_in() && get_option('cheshire_plugin_show_preview_logged_out', 'off') === 'on'),
+            'preview_text' => get_option('cheshire_plugin_preview_text_logged_out', ''),
         )
     );
 
     // Also set the page ID as a global JavaScript variable for backward compatibility
     wp_add_inline_script('cheshire-chat-js', 'window.cheshire_page_id = ' . $current_page_id . ';', 'before');
 
+    // Add websocket URL inline script if set
+    if (!empty($cheshire_plugin_websocket_url)) {
+        wp_add_inline_script('cheshire-chat-js', 'if(typeof cheshire_ajax_object !== "undefined") { cheshire_ajax_object.websocket_url = "' . esc_js($cheshire_plugin_websocket_url) . '"; }', 'before');
+    }
+
     // Enqueue Font Awesome for icons.
     wp_enqueue_style(
-        'font-awesome-css', 
-        CHESHIRE_CAT_PLUGIN_URL . 'assets/css/font-awesome/all.min.css', 
-        array(), 
+        'font-awesome-css',
+        CHESHIRE_CAT_PLUGIN_URL . 'assets/css/font-awesome/all.min.css',
+        array(),
         $version
     );
 
@@ -325,11 +420,14 @@ add_action( 'wp_enqueue_scripts', __NAMESPACE__ . '\cheshirecat_enqueue_scripts'
 
 /**
  * Add websocket URL to JavaScript data
- * 
+ *
  * @since 0.7.2
  * @return void
  */
 function cheshirecat_add_websocket_url() {
+    if ( ! wp_script_is( 'cheshire-chat-js', 'enqueued' ) ) {
+        return;
+    }
     $cheshire_plugin_websocket_url = get_option('cheshire_plugin_websocket_url', '');
     if (!empty($cheshire_plugin_websocket_url)) {
         wp_add_inline_script('cheshire-chat-js', 'if(typeof cheshire_ajax_object !== "undefined") { cheshire_ajax_object.websocket_url = "' . esc_js($cheshire_plugin_websocket_url) . '"; }', 'before');
@@ -357,9 +455,9 @@ function cheshirecat_admin_enqueue_scripts($hook) {
 
         // Enqueue admin styles
         wp_enqueue_style(
-            'cheshire-admin-css', 
-            CHESHIRE_CAT_PLUGIN_URL . 'assets/css/admin.css', 
-            array(), 
+            'cheshire-admin-css',
+            CHESHIRE_CAT_PLUGIN_URL . 'assets/css/admin.css',
+            array(),
             $version
         );
     }
@@ -413,8 +511,14 @@ function cheshirecat_admin_enqueue_scripts($hook) {
     $default_state = get_option('cheshire_plugin_default_state', 'open');
     $enable_websocket = get_option('cheshire_plugin_enable_websocket', 'off');
     $cheshire_plugin_url = get_option('cheshire_plugin_url', '');
+    $cheshire_plugin_url_v2 = get_option('cheshire_plugin_url_v2', '');
     $cheshire_plugin_websocket_url = get_option('cheshire_plugin_websocket_url', '');
     $cheshire_plugin_token = get_option('cheshire_plugin_token', '');
+    $cheshire_plugin_cat_version = get_option('cheshire_plugin_cat_version', 'v1');
+    $cheshire_plugin_api_key = get_option('cheshire_plugin_api_key', '');
+
+    // Seleziona l'URL corretto in base alla versione attiva
+    $active_cheshire_url = ( $cheshire_plugin_cat_version === 'v2' ) ? $cheshire_plugin_url_v2 : $cheshire_plugin_url;
 
     // Get context and reinforcement settings
     $enable_context = get_option('cheshire_plugin_enable_context', 'off');
@@ -427,17 +531,23 @@ function cheshirecat_admin_enqueue_scripts($hook) {
     $link_text = get_option('cheshire_plugin_link_text', 'Related link');
 
     // Localize script with AJAX data.
+    // Security: same policy as the frontend – credentials are only exposed to JS
+    // when WebSocket mode is active.
+    $ws_active = ( $enable_websocket === 'on' );
     wp_localize_script(
-        'cheshire-chat-js', 
-        'cheshire_ajax_object', 
+        'cheshire-chat-js',
+        'cheshire_ajax_object',
         array(
             'ajax_url' => admin_url( 'admin-ajax.php' ),
             'nonce'    => wp_create_nonce( 'cheshire_ajax_nonce' ),
             'page_id'  => $current_page_id,
             'default_state' => $default_state,
             'enable_websocket' => $enable_websocket,
-            'cheshire_url' => $cheshire_plugin_url,
-            'token' => $cheshire_plugin_token,
+            'cheshire_url' => $active_cheshire_url,
+            // Only expose credentials when WebSocket is active (browser connects directly)
+            'token'   => $ws_active ? $cheshire_plugin_token   : '',
+            'api_key' => $ws_active ? $cheshire_plugin_api_key : '',
+            'cat_version' => $cheshire_plugin_cat_version,
             // Add context and reinforcement settings for WebSocket
             'enable_context' => $enable_context,
             'enable_reinforcement' => $enable_reinforcement,
@@ -456,9 +566,9 @@ function cheshirecat_admin_enqueue_scripts($hook) {
 
     // Enqueue Font Awesome for icons.
     wp_enqueue_style(
-        'font-awesome-css', 
-        CHESHIRE_CAT_PLUGIN_URL . 'assets/css/font-awesome/all.min.css', 
-        array(), 
+        'font-awesome-css',
+        CHESHIRE_CAT_PLUGIN_URL . 'assets/css/font-awesome/all.min.css',
+        array(),
         $version
     );
 
@@ -499,7 +609,7 @@ add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\cheshirecat_admin_enqueue
 
 /**
  * Add websocket URL to JavaScript data in admin
- * 
+ *
  * @since 0.7.2
  * @return void
  */
@@ -642,10 +752,34 @@ function cheshirecat_generate_dynamic_css() {
             outline: 2px solid var(--chat-button-color);
             outline-offset: 2px;
         }
-        
+
         #cheshire-chat-messages .error-message p {
             color: var(--chat-error-msg-color);
             font-weight: 600;
+        }
+
+        /* Preview Only Mode */
+        #cheshire-chat-container.cheshire-preview-only #cheshire-chat-messages {
+            height: auto;
+            max-height: 300px;
+            padding: 20px;
+        }
+        #cheshire-chat-container.cheshire-preview-only .bot-message {
+            float: none;
+            display: block;
+            max-width: 100%;
+            margin-bottom: 0;
+            background-color: var(--chat-bot-msg-bg);
+            border: 1px solid var(--chat-border-color);
+            box-shadow: none;
+            text-align: center;
+            font-size: 15px;
+            color: var(--chat-bot-msg-color);
+        }
+        #cheshire-chat-container.cheshire-preview-only .bot-message a {
+            color: var(--chat-primary-color);
+            text-decoration: underline;
+            font-weight: bold;
         }
     ";
 
@@ -732,12 +866,19 @@ function cheshirecat_add_predefined_responses_to_content( $content ) {
         return $content;
     }
 
+    // New check: skip if in preview mode for logged-out users
+    $logged_in_only = get_option('cheshire_plugin_logged_in_only', 'off');
+    $show_preview_logged_out = get_option('cheshire_plugin_show_preview_logged_out', 'off');
+    if ($logged_in_only === 'on' && !is_user_logged_in() && $show_preview_logged_out === 'on') {
+        return $content;
+    }
+
     // Only show on singular posts/pages
     if ( ! is_singular() ) {
         return $content;
     }
 
-    if (  is_product() ) {
+    if ( function_exists( 'is_product' ) && is_product() ) {
         return $content;
     }
 
@@ -793,8 +934,15 @@ function cheshirecat_add_predefined_responses_after_product_short_description() 
         return;
     }
 
+    // New check: skip if in preview mode for logged-out users
+    $logged_in_only = get_option('cheshire_plugin_logged_in_only', 'off');
+    $show_preview_logged_out = get_option('cheshire_plugin_show_preview_logged_out', 'off');
+    if ($logged_in_only === 'on' && !is_user_logged_in() && $show_preview_logged_out === 'on') {
+        return;
+    }
+
     // Only show on product pages
-    if ( ! is_product() ) {
+    if ( ! function_exists( 'is_product' ) || ! is_product() ) {
         return;
     }
 

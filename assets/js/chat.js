@@ -4,7 +4,7 @@
  * Handles the chat interface functionality including sending messages,
  * receiving responses, and updating the UI.
  */
-jQuery(document).ready(function($) {
+jQuery(document).ready(function ($) {
     'use strict';
 
     /**
@@ -44,7 +44,7 @@ jQuery(document).ready(function($) {
                 page_id: cheshire_ajax_object.page_id || '',
                 page_url: window.location.href
             },
-            success: function(response) {
+            success: function (response) {
                 if (response.success) {
                     callback(response.data);
                 } else {
@@ -53,7 +53,7 @@ jQuery(document).ready(function($) {
                     callback('');
                 }
             },
-            error: function(error) {
+            error: function (error) {
                 console.error('AJAX error when getting context information:', error);
                 // Return an empty context if there's an error
                 callback('');
@@ -92,7 +92,7 @@ jQuery(document).ready(function($) {
         tempDiv.find('script, iframe, object, embed, style').remove();
 
         // Remove dangerous attributes from all elements
-        tempDiv.find('*').each(function() {
+        tempDiv.find('*').each(function () {
             var element = $(this);
             var attrs = element[0].attributes;
             var attrsToRemove = [];
@@ -121,7 +121,7 @@ jQuery(document).ready(function($) {
 
     /**
      * Get related link HTML from declarative memory items
-     * 
+     *
      * @param {Object} data - The response data containing declarative memory items
      * @param {boolean} isWebSocket - Whether this is for WebSocket mode
      * @param {string} currentPostId - The ID of the current post (if in a post detail view)
@@ -138,7 +138,7 @@ jQuery(document).ready(function($) {
         let declarativeItems = null;
 
         if (data.why && data.why.memory && data.why.memory.declarative &&
-                 data.why.memory.declarative.length > 0) {
+            data.why.memory.declarative.length > 0) {
             declarativeItems = data.why.memory.declarative;
         }
 
@@ -155,7 +155,7 @@ jQuery(document).ready(function($) {
 
         for (let item of declarativeItems) {
             // Skip items that have the same ID as the current post
-            if (currentPostId && item.metadata && item.metadata.wp_id && 
+            if (currentPostId && item.metadata && item.metadata.wp_id &&
                 item.metadata.wp_id === currentPostId) {
                 continue;
             }
@@ -213,11 +213,12 @@ jQuery(document).ready(function($) {
         }
 
         if (typeof data === 'object') {
-           if (data.text) {
+            if (data.text) {
                 content = data.text;
             }
 
-           console.log(cheshire_ajax_object);
+            //TODO: WARNING: tenere commentata in produzione, molto pericolosa perchè espone il token
+            //console.log('cheshire_ajax_object', cheshire_ajax_object);
 
             // Add related link HTML if available
             const relatedLinkHtml = getRelatedLinkHtml(data, false, cheshire_ajax_object.page_id);
@@ -229,7 +230,7 @@ jQuery(document).ready(function($) {
         }
 
         // Handle code blocks with backticks
-        content = content.replace(/```(\w*)\n([\s\S]*?)\n```/g, function(match, language, code) {
+        content = content.replace(/```(\w*)\n([\s\S]*?)\n```/g, function (match, language, code) {
             return '<pre><code class="language-' + language + '">' + code + '</code></pre>';
         });
 
@@ -342,7 +343,7 @@ jQuery(document).ready(function($) {
 
     /**
      * Update the streaming message with new token content
-     * 
+     *
      * @param {string} content - The token content to append
      */
     function updateStreamingMessage(content) {
@@ -402,9 +403,9 @@ jQuery(document).ready(function($) {
             justFinishedStreaming = true;
 
             // Reset the flag after a short delay to handle any future messages correctly
-           // setTimeout(function() {
-           //     justFinishedStreaming = false;
-           // }, 1000);
+            // setTimeout(function() {
+            //     justFinishedStreaming = false;
+            // }, 1000);
         }
     }
 
@@ -429,9 +430,10 @@ jQuery(document).ready(function($) {
      */
     function initWebSocket() {
         // Check if WebSocket is enabled, URL is provided, and chatbot is enabled on this page
-        if (cheshire_ajax_object.enable_websocket !== 'on' || 
-            !cheshire_ajax_object.cheshire_url || 
-            !cheshire_ajax_object.is_chatbot_enabled) {
+        if (cheshire_ajax_object.enable_websocket !== 'on' ||
+            !cheshire_ajax_object.cheshire_url ||
+            !cheshire_ajax_object.is_chatbot_enabled ||
+            cheshire_ajax_object.is_preview) {
             return false;
         }
 
@@ -453,8 +455,12 @@ jQuery(document).ready(function($) {
         // Add the WebSocket endpoint
         wsUrl += 'ws';
 
-        // Add token as query parameter if available
-        if (cheshire_ajax_object.token) {
+        // Add authentication query parameter based on the Cat version:
+        // - v1 uses ?token=  (Bearer token)
+        // - v2 uses ?apiKey= (API Key)
+        if (cheshire_ajax_object.cat_version === 'v2' && cheshire_ajax_object.api_key) {
+            wsUrl += '?apiKey=' + encodeURIComponent(cheshire_ajax_object.api_key);
+        } else if (cheshire_ajax_object.token) {
             wsUrl += '?token=' + encodeURIComponent(cheshire_ajax_object.token);
         }
 
@@ -463,12 +469,12 @@ jQuery(document).ready(function($) {
             websocket = new WebSocket(wsUrl);
 
             // Connection opened
-            websocket.onopen = function(event) {
+            websocket.onopen = function (event) {
                 console.log('WebSocket connection established');
             };
 
             // Listen for messages
-            websocket.onmessage = function(event) {
+            websocket.onmessage = function (event) {
                 try {
                     var response = JSON.parse(event.data);
                     // Check if this is a token message
@@ -484,8 +490,8 @@ jQuery(document).ready(function($) {
                     if (isStreaming) {
 
                         if (response.type === 'chat') {
-                          //  console.log(response);
-                           // console.log(cheshire_ajax_object);
+                            //  console.log(response);
+                            // console.log(cheshire_ajax_object);
                             // Add related link HTML if available
                             const relatedLinkHtml = getRelatedLinkHtml(response, true, cheshire_ajax_object.page_id);
                             if (relatedLinkHtml) {
@@ -520,7 +526,7 @@ jQuery(document).ready(function($) {
             };
 
             // Connection closed
-            websocket.onclose = function(event) {
+            websocket.onclose = function (event) {
                 console.log('WebSocket connection closed');
 
                 // Clean up streaming state if we were in the middle of streaming
@@ -532,7 +538,7 @@ jQuery(document).ready(function($) {
             };
 
             // Connection error
-            websocket.onerror = function(error) {
+            websocket.onerror = function (error) {
                 console.error('WebSocket error:', error);
                 displayMessage('WebSocket connection error', 'error');
 
@@ -557,8 +563,8 @@ jQuery(document).ready(function($) {
     function sendMessage() {
         var message = $('#cheshire-chat-input').val();
 
-        // Don't send empty messages
-        if (message.trim() === '') {
+        // Don't send empty messages or if in preview mode
+        if (message.trim() === '' || cheshire_ajax_object.is_preview) {
             return;
         }
 
@@ -624,7 +630,7 @@ jQuery(document).ready(function($) {
 
             // If context is enabled, get it via AJAX and then send the message
             if (enableContext === 'on') {
-                getContextInformation(function(contextInfo) {
+                getContextInformation(function (contextInfo) {
                     prepareAndSendWebSocketMessage(message, contextInfo);
                 });
             } else {
@@ -646,7 +652,7 @@ jQuery(document).ready(function($) {
                     page_id: cheshire_ajax_object.page_id || '',
                     page_url: window.location.href
                 },
-                success: function(response) {
+                success: function (response) {
                     // Hide loading indicator
                     hideLoader();
 
@@ -663,7 +669,7 @@ jQuery(document).ready(function($) {
                         displayMessage(response.data || 'Unknown error', 'error');
                     }
                 },
-                error: function(error) {
+                error: function (error) {
                     // Hide loading indicator
                     hideLoader();
 
@@ -690,7 +696,7 @@ jQuery(document).ready(function($) {
         }
 
         // Display each stored message
-        messages.forEach(function(msgObj) {
+        messages.forEach(function (msgObj) {
             // Use store=false to avoid re-storing the messages
             displayMessage(msgObj.message, msgObj.type, false);
         });
@@ -714,7 +720,7 @@ jQuery(document).ready(function($) {
                 action: 'cheshire_get_welcome_message',
                 nonce: cheshire_ajax_object.nonce
             },
-            success: function(response) {
+            success: function (response) {
                 if (response.success) {
                     $('#cheshire-chat-messages').html(response.data);
                 } else {
@@ -722,7 +728,7 @@ jQuery(document).ready(function($) {
                     $('#cheshire-chat-messages').html('<div class="bot-message"><p>Hello! How can I help you?</p></div>');
                 }
             },
-            error: function() {
+            error: function () {
                 // If AJAX fails, add a default welcome message
                 $('#cheshire-chat-messages').html('<div class="bot-message"><p>Hello! How can I help you?</p></div>');
             }
@@ -733,6 +739,10 @@ jQuery(document).ready(function($) {
      * Display predefined responses as clickable tags.
      */
     function displayPredefinedResponses() {
+        if (cheshire_ajax_object.is_preview) {
+            return;
+        }
+
         // Check if predefined responses container exists, if not create it
         if ($('#cheshire-predefined-responses').length === 0) {
             $('#cheshire-chat-input-container').before('<div id="cheshire-predefined-responses"></div>');
@@ -749,13 +759,13 @@ jQuery(document).ready(function($) {
                 is_product_category: cheshire_ajax_object.is_product_category || false,
                 product_category_id: cheshire_ajax_object.product_category_id || 0
             },
-            success: function(response) {
+            success: function (response) {
                 if (response.success && response.data) {
                     var responses = response.data;
                     var tagsHtml = '';
 
                     // Create a tag for each predefined response
-                    responses.forEach(function(response) {
+                    responses.forEach(function (response) {
                         tagsHtml += '<span class="predefined-response-tag">' + encodeHTML(response) + '</span>';
                     });
 
@@ -769,7 +779,7 @@ jQuery(document).ready(function($) {
     /**
      * Handle click on predefined response tag.
      */
-    $(document).on('click', '.predefined-response-tag', function() {
+    $(document).on('click', '.predefined-response-tag', function () {
         var message = $(this).text();
         $('#cheshire-chat-input').val(message);
 
@@ -799,12 +809,12 @@ jQuery(document).ready(function($) {
     // Set up event handlers
 
     // Send message on click
-    $('#cheshire-chat-send').click(function() {
+    $('#cheshire-chat-send').click(function () {
         sendMessage();
     });
 
     // Send message on Enter key press
-    $('#cheshire-chat-input').keypress(function(event) {
+    $('#cheshire-chat-input').keypress(function (event) {
         if (event.which === 13) {
             sendMessage();
             return false; // Prevent default behavior (form submission)
@@ -812,7 +822,7 @@ jQuery(document).ready(function($) {
     });
 
     // Close chat on X button click
-    $('#cheshire-chat-close').click(function() {
+    $('#cheshire-chat-close').click(function () {
         // Don't hide the chat on the playground page
         if ($('#cheshire-chat-container').hasClass('playground')) {
             return;
@@ -826,12 +836,12 @@ jQuery(document).ready(function($) {
     });
 
     // Start new conversation on "New" button click
-    $('#cheshire-chat-new').click(function() {
+    $('#cheshire-chat-new').click(function () {
         clearChatHistory();
     });
 
     // Open chat when avatar is clicked
-    $(document).on('click', '#cheshire-chat-avatar', function() {
+    $(document).on('click', '#cheshire-chat-avatar', function () {
         if ($('#cheshire-chat-container').hasClass('cheshire-chat-closed')) {
             $('#cheshire-chat-container').removeClass('cheshire-chat-closed').addClass('cheshire-chat-open');
             // Update localStorage
@@ -842,12 +852,23 @@ jQuery(document).ready(function($) {
     });
 
     // Check if chat should be opened on page load
-    $(document).ready(function() {
+    $(document).ready(function () {
         // Always show the chat on the playground page
         if ($('#cheshire-chat-container').hasClass('playground')) {
             $('#cheshire-chat-container').removeClass('cheshire-chat-closed').addClass('cheshire-chat-open');
             // Initialize WebSocket when chat is opened
             initWebSocket();
+            return;
+        }
+
+        // If in preview mode, prepare the preview UI
+        if (cheshire_ajax_object.is_preview) {
+            $('#cheshire-chat-messages').empty();
+            $('#cheshire-chat-messages').append('<div class="bot-message"><p>' + (cheshire_ajax_object.preview_text || 'Please log in to use the chatbot.') + '</p></div>');
+            $('#cheshire-chat-input-container').hide();
+            $('#cheshire-chat-new').hide();
+            $('#cheshire-predefined-responses').hide();
+            // Don't load stored messages in preview mode
             return;
         }
 

@@ -17,8 +17,13 @@ function cheshirecat_meowww_page()
         wp_die(esc_html__('You do not have sufficient permissions to access this page.', 'cheshire-cat-chatbot'));
     }
     // Check if the Cheshire Cat URL is configured
-    $cheshire_url = get_option('cheshire_plugin_url', '');
+    $cheshire_plugin_cat_version = get_option('cheshire_plugin_cat_version', 'v1');
+    $cheshire_plugin_url = get_option('cheshire_plugin_url', '');
+    $cheshire_plugin_url_v2 = get_option('cheshire_plugin_url_v2', '');
     $cheshire_token = get_option('cheshire_plugin_token', '');
+    $cheshire_api_key = get_option('cheshire_plugin_api_key', '');
+
+    $cheshire_url = ($cheshire_plugin_cat_version === 'v2') ? $cheshire_plugin_url_v2 : $cheshire_plugin_url;
 
     if (empty($cheshire_url)) {
         $error_message = __('Cheshire Cat URL is not configured. Please go to the Configuration page and set the Cheshire Cat URL.', 'cheshire-cat-chatbot');
@@ -29,7 +34,9 @@ function cheshirecat_meowww_page()
             // Get the Cheshire Cat client
             $client = new \webgrafia\cheshirecat\inc\classes\Custom_Cheshire_Cat_Client(
                 $cheshire_url,
-                $cheshire_token
+                $cheshire_token,
+                $cheshire_plugin_cat_version,
+                $cheshire_api_key
             );
 
             // Get the list of installed plugins

@@ -15,7 +15,10 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 
 $option_names = array(
     'cheshire_plugin_url',
+    'cheshire_plugin_url_v2',
     'cheshire_plugin_token',
+    'cheshire_plugin_cat_version',
+    'cheshire_plugin_api_key',
     'cheshire_plugin_global_chat',
     'cheshire_plugin_enable_avatar',
     'cheshire_plugin_enable_context',
